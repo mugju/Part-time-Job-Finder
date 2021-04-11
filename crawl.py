@@ -35,7 +35,8 @@ while(len(result) <= 100):  # 결과가 100개 넘어야 함.
         df = pd.DataFrame([[locations, company, time, paymethod, regdate]], columns=[
                           '지역', '근무회사', '근무시간', '급여', '올린시간'])
         number += 2  # 다음꺼 접근해야지
-        if paymethod.find("월급") == 1:
+        if paymethod.find("월급")== 1 or paymethod.find("연봉") == 1:
+            print("cut!!")
             continue  # 월급준다는 거면 일단 제끼기 알바가 아닐 확률이 높기 때문임.
         else:
             result = result.append(df)
