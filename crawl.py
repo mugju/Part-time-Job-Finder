@@ -19,29 +19,34 @@ while(len(result) <= 100):  # 결과가 100개 넘어야 함.
         title = soup.select_one(
             '#NormalInfo > table > tbody > tr:nth-child(%d)' % number)
 
+        #근무지역에 대한 컬럼
         locations = re.sub(
             '<.+?>', '', str(title.select('td.local.first')), 0).strip()
-
+        
+        #근무회사에대한 컬럼
         company = re.sub(
             '<.+?>', '', str(title.select('td.title > a > span.company')), 0).strip()
-
+        
+        #근무시간에 대한 컬럼
         time = re.sub('<.+?>', '', str(title.select('td.data')), 0).strip()
-
+        
+        #급여에 대한 컬럼
         paymethod = re.sub('<.+?>', '', str(title.select('td.pay')), 0).strip()
 
+        #올린시간에 대한 컬럼
         regdate = re.sub(
             '<.+?>', '', str(title.select('td.regDate.last')), 0).strip()
 
         df = pd.DataFrame([[locations, company, time, paymethod, regdate]], columns=[
                           '지역', '근무회사', '근무시간', '급여', '올린시간'])
-        number += 2  # 다음꺼 접근해야지
-        if paymethod.find("월급")== 1 or paymethod.find("연봉") == 1:
-            print("cut!!")
+        number += 2  # 다음꺼 접근해야지 
+        if paymethod.find("월급")== 1 or paymethod.find("연봉") == 1:       #알바가 아닌 직원을 구하는 글에대한 필터링 작업
+            #print("cut!!")
             continue  # 월급준다는 거면 일단 제끼기 알바가 아닐 확률이 높기 때문임.
         else:
             result = result.append(df)
 
-    result = result.drop_duplicates(['근무회사'], keep='first')
+    result = result.drop_duplicates(['근무회사'], keep='first') #중복글에 대한 처리
     print(result)
     print(len(result))
 
@@ -49,5 +54,5 @@ while(len(result) <= 100):  # 결과가 100개 넘어야 함.
 
     #후처리로 drop_duplicate 사용해서 중복되는 것들 제거할 것
 
-#to_csv'
+#to_csv' 인덱스는 제거할 것
 result.to_csv('albaheaven.csv', encoding='CP949', index=False)
