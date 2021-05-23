@@ -38,8 +38,12 @@ while(len(result) <= 100):  # 결과가 100개 넘어야 함.
         regdate = re.sub(
             '<.+?>', '', str(title.select('td.regDate.last')), 0).strip()
 
-        df = pd.DataFrame([[locations, company, time, paymethod, regdate]], columns=[
-                          '지역', '근무회사', '근무시간', '급여', '올린시간'])
+        #알바설명에 대한 컬럼
+        info= re.sub(
+            '<.+?>', '', str(title.select('td.title > a > span.title')), 0).strip()
+
+        df = pd.DataFrame([[locations, company, time, paymethod, regdate, info]], columns=[
+                          '지역', '근무회사', '근무시간', '급여', '올린시간','알바설명'])
         number += 2  # 다음꺼 접근해야지
         # 알바가 아닌 직원을 구하는 글에대한 필터링 작업
         if paymethod.find("월급") == 1 or paymethod.find("연봉") == 1:
