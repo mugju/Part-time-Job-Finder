@@ -21,31 +21,43 @@ while(len(result) <= 100):  # 결과가 100개 넘어야 함.
             '#NormalInfo > table > tbody > tr:nth-child(%d)' % number)
 
         #근무지역에 대한 컬럼
-        locations = re.sub(
-            '<.+?>', '', str(title.select('td.local.first')), 0).strip()
-
-        #근무회사에대한 컬럼
+        locations = str(re.sub(
+            '<.+?>', '', str(title.select('td.local.first')), 0).strip())
+        locations = locations.replace('[' , '')
+        locations = locations.replace(']' , '')
+        
+        # #근무회사에대한 컬럼
         company = re.sub(
             '<.+?>', '', str(title.select('td.title > a > span.company')), 0).strip()
-
+        company = company.replace('[' , '')
+        company = company.replace(']' , '')
+        
         #근무시간에 대한 컬럼
         time = re.sub('<.+?>', '', str(title.select('td.data')), 0).strip()
+        time = time.replace('[' , '')
+        time = time.replace(']' , '')
 
         #급여에 대한 컬럼
         paymethod = re.sub('<.+?>', '', str(title.select('td.pay')), 0).strip()
-
+        paymethod = paymethod.replace('[' , '')
+        paymethod = paymethod.replace(']' , '')
         #올린시간에 대한 컬럼
         regdate = re.sub(
             '<.+?>', '', str(title.select('td.regDate.last')), 0).strip()
 
+        regdate = regdate.replace('[' , '')
+        regdate = regdate.replace(']' , '')
         #알바설명에 대한 컬럼
         info= re.sub(
             '<.+?>', '', str(title.select('td.title > a > span.title')), 0).strip()
 
+        info = info.replace('[' , '')
+        info = info.replace(']' , '')
+
         df = pd.DataFrame([[locations, company, time, paymethod, regdate, info]], columns=[
                           '지역', '근무회사', '근무시간', '급여', '올린시간','알바설명'])
         number += 2  # 다음꺼 접근해야지
-        # 알바가 아닌 직원을 구하는 글에대한 필터링 작업
+        # 알바가 아닌 직원을 구하는 글에대한 필터링 작업 이거에 대해서 삭제작업 추가해야함.
         if paymethod.find("월급") == 1 or paymethod.find("연봉") == 1:
             #print("cut!!")
             continue  # 월급준다는 거면 일단 제끼기 알바가 아닐 확률이 높기 때문임.

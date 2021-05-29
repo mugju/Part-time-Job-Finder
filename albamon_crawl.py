@@ -15,7 +15,7 @@ new_df = pd.DataFrame(columns=['지역', '근무회사', '근무시간','급여'
 
 
 pagenum = 1 #첫 페이지
-while(pagenum < 3):  #n개 페이지에 대하여 크롤링
+while(len(result) <100):  #n개 페이지에 대하여 크롤링
     print(pagenum)
     
     # 리스트 초기화
@@ -79,23 +79,35 @@ while(pagenum < 3):  #n개 페이지에 대하여 크롤링
 
     #================================================
     #올린시간
-    recently = conte.select('td.recently > em')
-    for ww in recently:
-        recently_list.append(ww.get_text().strip())
-        #print(ww.get_text().strip())
-    
+
+    #태그의 변화 날짜는 못받아오더라
+    recently_ = conte.select('td.recently')
+    print(recently_)
+    for ws in recently_:
+        recently_list.append(ws.get_text())
+
+    print(recently_list)
+
     
     new_df['지역'] = area_list
     new_df['근무회사'] = cName_list
     new_df['근무시간'] = time_list
     new_df['급여'] = pay_list
+    print(url)
     new_df['올린시간'] = recently_list
     new_df['알바설명'] = cTit_list    
-    print(new_df)
+    #print(new_df)
+
 
     result = pd.concat([result,new_df])
-    #result.reset_index([range(result.len())])
-
+    result = result.drop_duplicates(['근무회사'], keep='first')  # 중복글에 대한 처리
+    
+    print(result)
+    
+    result['순서'] = range(len(result))
+    result = result.set_index('순서')
+    print(len(result))
+result.to_csv('albamon.csv', encoding='CP949', index=False)
 
 
 print(result)
