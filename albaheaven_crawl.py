@@ -5,21 +5,28 @@ import numpy as np
 import re
 
 
-def Heaven() :
+def Heaven(url) :
     result = pd.DataFrame()  # 결과저장용 DataFrame
     pagenum = 1
+    #print(url)
 
-    while(len(result) <= 100):  # 결과가 100개 넘어야 함.
-        url = 'http://www.alba.co.kr/job/area/MainLocal.asp?page=argu&pagesize=50&viewtype=L&sidocd=031&gugun=%BD%C3%C8%EF%BD%C3,&dong=%C0%FC%C3%BC&d_area=&d_areacd=&strAreaMulti=031%7C%7C%BD%C3%C8%EF%BD%C3%7C%7C%C0%FC%C3%BC%2C&hidJobKind=&hidJobKindMulti=&WorkTime=&searchterm=&AcceptMethod=&ElecContract=&HireTypeCD=&CareerCD=&CareercdUnRelated=&LastSchoolCD=&LastSchoolcdUnRelated=&GenderCD=&GenderUnRelated=&AgeLimit=0&AgeUnRelated=&PayCD=&PayStart=&WelfareCD=&Special=&WorkWeekCD=&WeekDays=&hidSortCnt=50&hidSortOrder=&hidSortDate=&WorkPeriodCD=&hidSort=&hidSortFilter=Y&hidListView=LIST&WsSrchKeywordWord=&hidWsearchInOut=&hidSchContainText='
-        url = url.replace('argu', str(pagenum))  # 페이지 1에대한 경우 이후 이는 변수로 처리할 것.
-        html = urllib.request.urlopen(url)
+    while(len(result) <= 70 ):  # 결과가 100개 넘어야 함. 아니면 진짜 없어서 15번 돌려도 없을때
+        #url = 'http://www.alba.co.kr/job/area/MainLocal.asp?page=argu&pagesize=50&viewtype=L&sidocd=031&gugun=%BD%C3%C8%EF%BD%C3,&dong=%C0%FC%C3%BC&d_area=&d_areacd=&strAreaMulti=031%7C%7C%BD%C3%C8%EF%BD%C3%7C%7C%C0%FC%C3%BC%2C&hidJobKind=&hidJobKindMulti=&WorkTime=&searchterm=&AcceptMethod=&ElecContract=&HireTypeCD=&CareerCD=&CareercdUnRelated=&LastSchoolCD=&LastSchoolcdUnRelated=&GenderCD=&GenderUnRelated=&AgeLimit=0&AgeUnRelated=&PayCD=&PayStart=&WelfareCD=&Special=&WorkWeekCD=&WeekDays=&hidSortCnt=50&hidSortOrder=&hidSortDate=&WorkPeriodCD=&hidSort=&hidSortFilter=Y&hidListView=LIST&WsSrchKeywordWord=&hidWsearchInOut=&hidSchContainText='
+        url_new = url.replace('argu', str(pagenum))  # 페이지 1에대한 경우 이후 이는 변수로 처리할 것.
+        print(pagenum)
+        print(url_new)
+        html = urllib.request.urlopen(url_new)
         soup = BeautifulSoup(html, 'html.parser')
+        if(pagenum == 15) : break
 
         # crawltags = '#NormalInfo > table > tbody > tr:nth-child(1)'
         number = 1  # 99까지가 한페이지 사이클임
         while number < 99:
             title = soup.select_one(
                 '#NormalInfo > table > tbody > tr:nth-child(%d)' % number)
+            
+            #뭐지 타입 논으로뜨는거 예외처리 해주자.
+            if str(type(title)) == "<class 'NoneType'>" : break
 
             #근무지역에 대한 컬럼
             locations = str(re.sub(
@@ -88,8 +95,13 @@ def Heaven() :
 
     #to_csv' 인덱스는 제거할 것
     result.to_csv('albaheaven.csv', encoding='CP949', index=False)
+    #return 0
 
 
 
 if __name__ == "__main__":
-	Heaven()
+    gyeonggi_list = ['가평군' ,'고양시 덕양구' ,'고양시 일산동구','고양시 일산서구' ,'과천시' ,'광명시' ,'광주시' ,'구리시' ,'군포시' ,'김포시' ,'남양주시' ,'동두천시' ,'부천시' ,'성남시 분당구' ,'성남시 수정구' ,'성남시 중원구' ,'수원시 권선구' ,'수원시 영통구' ,'수원시 장안구', '수원시 팔달구' ,'시흥시' ,'안산시 단원구' ,'안산시 상록구' ,'안성시', '안양시 동안구' ,'안양시 만안구' ,'양주시' ,'양평군' ,'여주시 연천군' ,'오산시',' 용인시 기흥구' ,'용인시 수지구', '용인시 처인구' ,'의왕시 의정부시' ,'이천시' ,'파주시' ,'평택시' ,'포천시', '하남시' ,'화성시']
+    list_file = open('albaheaven_url_list.txt', 'r',encoding='utf-8').read().split('\n')
+    output = dict(zip(gyeonggi_list,list_file))
+    #output['시흥시']
+    Heaven(output['과천시'])
