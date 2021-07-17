@@ -202,32 +202,6 @@ p, li { white-space: pre-wrap; }
      <string>알바천국 결과출력</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioMon">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>570</y>
-      <width>90</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>알바몬 </string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioHeaven">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>590</y>
-      <width>90</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>알바천국 </string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
@@ -250,14 +224,17 @@ p, li { white-space: pre-wrap; }
       <height>23</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
     <property name="value">
-     <number>24</number>
+     <number>-1</number>
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>240</x>
       <y>570</y>
       <width>81</width>
       <height>16</height>
@@ -270,7 +247,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QCheckBox" name="checkBox_2">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>240</x>
       <y>590</y>
       <width>81</width>
       <height>16</height>
