@@ -133,7 +133,8 @@ def Monster(local):
 
         print(result)
     finally: # 페이지가 없는 경우
-        result.to_csv('albamon.csv', encoding='CP949', index=False)
+        print("알바몬 인증에러")
+        #result.to_csv('albamon.csv', encoding='CP949', index=False)
 
 
 

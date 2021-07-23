@@ -1,13 +1,22 @@
 # 해당 코드는 GUI와 크롤링 코드를 합치기 위함임.
 # -*- coding: utf-8 -*-
 
+#webwidget 제거해보자
+
 import sys
 import csv
-import time
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5 import uic
 import pandas as pd
+import ctypes
+
+try:
+    # new location for sip
+    # https://www.riverbankcomputing.com/static/Docs/PyQt5/incompatibilities.html#pyqt-v5-11
+    from PyQt5 import sip
+except ImportError:
+    import sip
 
 seoul_list = ['강남구','강동구', '강북구' , '강서구' ,'관악구','광진구' , '구로구', '금천구' , '노원구', '도봉구', '동대문구', '동작구', '마포구' , '서대문구' , '서초구', '성동구', '성북구', '송파구' , '양천구' , '영등포구' , '용산구' , '은평구' , '종로구' , '중구' , '중랑구']
 
@@ -26,7 +35,9 @@ heaven_Gyeong = dict(zip(gyeongki_list,list_file))  #알바천국 경기도지�
 gyeongki_Mon_code = ['B010','B020','B030','B031','B040','B050','B060','B070','B080','B090','B100','B110','B125','B150','B160','B170','B180','B201','B190','B200','B210','B220','B221','B230','B240','B250','B260','B270','B280','B290','B300','B310','B311','B312','B320','B330','B340','B350','B360','B370','B380','B390']
 mon_Gyeong = dict(zip(gyeongki_list,gyeongki_Mon_code))  #알바몬 경기도지역 지역코드
 
+items = []
 
+searchItemIndex = 0
 
 
 
@@ -49,10 +60,7 @@ class Thread_Crawl(QThread):
         self.parent = parent
     
     def run(self):
-        
-        # global local_code # 전역변수 접근 위함
-        
-        # thread_Heaven = Thread_heaven(self)
+
 
         if self.parent.checkBox_2.isChecked() :
             if self.parent.comboBox.currentText() == '경기': albaHeaven.Heaven(heaven_Gyeong[self.parent.comboBox_2.currentText()])
@@ -78,6 +86,8 @@ class Thread_Crawl(QThread):
 
 
         print("albaheaven run")
+        # self.parent.progressBar.setMaximum(100)
+        # self.parent.progressBar.setValue(100) 
 
 
 
@@ -94,7 +104,8 @@ class WindowClass(QMainWindow, form_class) :
         #컬럼명 지정
         self.tableWidget.setHorizontalHeaderLabels(["지역", "근무회사", "근무시간", "급여", "올린시간", "알바설명"])
 
-        
+        self.progressBar.setMaximum(100)
+        self.progressBar.setValue(0)
         
         
         # QCombox 생성 및 아이템 추가 
@@ -108,6 +119,10 @@ class WindowClass(QMainWindow, form_class) :
         
         self.comboBox.move(40,580)
         self.comboBox_2.clear()
+
+
+
+        self.webEngineView.load(QUrl("https://www.albamon.com//jkWebModule/jkConfirm.aspx?r=16&a=/&ret=%2fgoodjob%2flist%2farea_list.asp%3frArea%3d%2cB000s"))
 
         
  
@@ -125,8 +140,17 @@ class WindowClass(QMainWindow, form_class) :
 
         self.albaMerge.clicked.connect(self.albaMerge_btn)
 
+
+        self.searchBtn.clicked.connect(self.search)
+
+        self.previous.clicked.connect(self.previous_btn)
+        self.next.clicked.connect(self.next_btn)
+
     ### CSV 파일의 경로를 파라미터로 넘겨주면 table 위젯에 공유정보 출력 메서드 ###
     def loadCSV(self, csvPath):
+
+        # self.parent.progressBar.setMaximum(100)
+        # self.parent.progressBar.setValue(100) 
         shareCSV = open(csvPath, 'r', encoding='CP949')
         shareObject = csv.reader(shareCSV)
         enumerate(shareObject)
@@ -151,17 +175,43 @@ class WindowClass(QMainWindow, form_class) :
         header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(5, QHeaderView.ResizeToContents)
+    
+    def search(self):
+        global items
+        items = []
+        items = self.tableWidget.findItems(self.textEdit.toPlainText(), Qt.MatchContains)
+        item = items[0]  # take the first
+        self.tableWidget.setCurrentItem(item)
 
-        
+
+    def next_btn(self):
+        global searchItemIndex
+        searchItemIndex += 1
+        if searchItemIndex == len(items): QMessageBox.information(self,'알림','마지막요소')
+        else : 
+            item = items[searchItemIndex]  # take the first
+            self.tableWidget.setCurrentItem(item)
+
+    def previous_btn(self):
+        global searchItemIndex
+        searchItemIndex -= 1
+        if searchItemIndex == -1: QMessageBox.information(self,'알림','마지막요소')
+        else : 
+            item = items[searchItemIndex]  # take the first
+            self.tableWidget.setCurrentItem(item)
+
 
 
         
 
     #크롤링 시작이 눌리면 작동할 함수
     def Crawl_start_btn(self) :
-        self.progressBar.setValue(10)
+        self.progressBar.setMaximum(0)
         Thread_action = Thread_Crawl(self)
-        Thread_action.start()
+        try:
+            Thread_action.start()
+        finally : # 알바몬 인증 때문임
+            ctypes.windll.user32.MessageBoxW(0, "혹여 창이 종료된다면 당황하지 마시고 우측 하단의 알바몬 창에서 IP인증 진행해주시고 다시 시도해주세요", "팝업창타이틀", 1)
 
 
     #알바몬만 검색이 눌리면 작동할 함수
