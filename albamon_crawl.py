@@ -1,8 +1,11 @@
+import sys
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
+# -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
-import urllib.request
+
 import pandas as pd
-import numpy as np
-import re
 import requests
 
 def Monster(local):

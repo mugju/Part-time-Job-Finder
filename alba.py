@@ -1,5 +1,10 @@
-# 해당 코드는 GUI와 크롤링 코드를 합치기 위함임.
 # -*- coding: utf-8 -*-
+import sys
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
+# 해당 코드는 GUI와 크롤링 코드를 합치기 위함임.
+
 
 #webwidget 제거해보자
 
@@ -11,12 +16,11 @@ from PyQt5 import uic
 import pandas as pd
 import ctypes
 
-try:
-    # new location for sip
-    # https://www.riverbankcomputing.com/static/Docs/PyQt5/incompatibilities.html#pyqt-v5-11
-    from PyQt5 import sip
-except ImportError:
-    import sip
+
+# new location for sip
+# https://www.riverbankcomputing.com/static/Docs/PyQt5/incompatibilities.html#pyqt-v5-11
+from PyQt5 import sip
+
 
 seoul_list = ['강남구','강동구', '강북구' , '강서구' ,'관악구','광진구' , '구로구', '금천구' , '노원구', '도봉구', '동대문구', '동작구', '마포구' , '서대문구' , '서초구', '성동구', '성북구', '송파구' , '양천구' , '영등포구' , '용산구' , '은평구' , '종로구' , '중구' , '중랑구']
 
