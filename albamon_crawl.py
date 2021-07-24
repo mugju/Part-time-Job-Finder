@@ -1,7 +1,4 @@
-import sys
-import io
-sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
-sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
+
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
 
@@ -22,7 +19,7 @@ def Monster(local):
     try:
         while(len(result) <80):  #n개 페이지에 대하여 크롤링
             print(pagenum)
-            if(pagenum == 15) : break #과도한 접속 방지
+            if(pagenum == 25) : break #과도한 접속 방지
             # 리스트 초기화
             area_list = []
             cName_list = []

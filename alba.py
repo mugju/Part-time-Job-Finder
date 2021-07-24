@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
-import io
-sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
-sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
+
+
 # 해당 코드는 GUI와 크롤링 코드를 합치기 위함임.
 
 
@@ -15,6 +14,8 @@ from PyQt5.QtCore import *
 from PyQt5 import uic
 import pandas as pd
 import ctypes
+import os
+
 
 
 # new location for sip
@@ -24,7 +25,7 @@ from PyQt5 import sip
 
 seoul_list = ['강남구','강동구', '강북구' , '강서구' ,'관악구','광진구' , '구로구', '금천구' , '노원구', '도봉구', '동대문구', '동작구', '마포구' , '서대문구' , '서초구', '성동구', '성북구', '송파구' , '양천구' , '영등포구' , '용산구' , '은평구' , '종로구' , '중구' , '중랑구']
 
-list_file_s = open('albaheaven_seoul_url.txt', 'r',encoding='utf-8').read().split('\n')
+list_file_s = open(os.path.abspath('albaheaven_seoul_url.txt'), 'r',encoding='utf-8').read().split('\n')
 heaven_Seoul = dict(zip(seoul_list,list_file_s))  #알바천국 서울지역 딕셔너리
 
 seoul_Mon_code = ['I010','I020','I030','I040','I050','I060','I070','I080','I090','I100','I110','I120','I130','I140','I150','I160','I170','I180','I190','I200','I210','I220','I230','I240','I250',]
@@ -33,7 +34,7 @@ mon_Seoul = dict(zip(seoul_list,seoul_Mon_code))  #알바몬 경기도지역 지
 
 gyeongki_list = ['가평군' ,'고양시 덕양구' ,'고양시 일산동구','고양시 일산서구' ,'과천시' ,'광명시' ,'광주시' ,'구리시' ,'군포시' ,'김포시' ,'남양주시' ,'동두천시' ,'부천시' ,'성남시 분당구' ,'성남시 수정구' ,'성남시 중원구' ,'수원시 권선구' ,'수원시 영통구' ,'수원시 장안구', '수원시 팔달구' ,'시흥시' ,'안산시 단원구' ,'안산시 상록구' ,'안성시', '안양시 동안구' ,'안양시 만안구' ,'양주시' ,'양평군' ,'여주시', '연천군' ,'오산시',' 용인시 기흥구' ,'용인시 수지구', '용인시 처인구' ,'의왕시', '의정부시' ,'이천시' ,'파주시' ,'평택시' ,'포천시', '하남시' ,'화성시']
 
-list_file = open('albaheaven_url_list.txt', 'r',encoding='utf-8').read().split('\n')
+list_file = open(os.path.abspath('albaheaven_url_list.txt'), 'r',encoding='utf-8').read().split('\n')
 heaven_Gyeong = dict(zip(gyeongki_list,list_file))  #알바천국 경기도지역 딕셔너리
 
 gyeongki_Mon_code = ['B010','B020','B030','B031','B040','B050','B060','B070','B080','B090','B100','B110','B125','B150','B160','B170','B180','B201','B190','B200','B210','B220','B221','B230','B240','B250','B260','B270','B280','B290','B300','B310','B311','B312','B320','B330','B340','B350','B360','B370','B380','B390']
@@ -51,7 +52,7 @@ import albamon_crawl as albaMon
 
 #UI파일 연결
 #단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
-form_class = uic.loadUiType("alba.ui")[0]
+form_class = uic.loadUiType(os.path.abspath("alba.ui"))[0]
 
 #지역을 찾아가는 전역변수 하나 만들어줬음.
 local_code = ''
@@ -72,12 +73,12 @@ class Thread_Crawl(QThread):
 
             if self.parent.comboBox.currentText() == '서울': albaHeaven.Heaven(heaven_Seoul[self.parent.comboBox_2.currentText()])
 
-            self.parent.loadCSV('albaheaven.csv')
+            self.parent.loadCSV(os.path.abspath('albaheaven.csv'))
             if self.parent.checkBox.isChecked() :
                 if self.parent.comboBox.currentText() == '경기': albaMon.Monster(mon_Gyeong[self.parent.comboBox_2.currentText()])
                 if self.parent.comboBox.currentText() == '서울': albaMon.Monster(mon_Seoul[self.parent.comboBox_2.currentText()])
-                df = pd.read_csv('albamon.csv',encoding='CP949')
-                df2 = pd.read_csv('albaheaven.csv',encoding='cp949')
+                df = pd.read_csv(os.path.abspath('albamon.csv'),encoding='CP949')
+                df2 = pd.read_csv(os.path.abspath('albaheaven.csv'),encoding='cp949')
                 df3 = df.append(df2)
                 df3 = df3.drop_duplicates(['근무회사'], keep='first')  # 중복글에 대한 처리
                 df3.to_csv('albamerge.csv', encoding='CP949', index=False)
@@ -86,7 +87,7 @@ class Thread_Crawl(QThread):
         elif self.parent.checkBox.isChecked() :
             if self.parent.comboBox.currentText() == '경기': albaMon.Monster(mon_Gyeong[self.parent.comboBox_2.currentText()])
             if self.parent.comboBox.currentText() == '서울': albaMon.Monster(mon_Seoul[self.parent.comboBox_2.currentText()])
-            self.parent.loadCSV('albamon.csv')
+            self.parent.loadCSV(os.path.abspath('albamon.csv'))
 
 
         print("albaheaven run")
@@ -220,17 +221,17 @@ class WindowClass(QMainWindow, form_class) :
 
     #알바몬만 검색이 눌리면 작동할 함수
     def onlyMon_btn(self) :
-        self.loadCSV('albamon.csv')
+        self.loadCSV(os.path.abspath('albamon.csv'))
         print("albaMon Clicked")
 
 
     def onlyHeaven_btn(self) :
-        self.loadCSV('albaheaven.csv')
+        self.loadCSV(os.path.abspath('albaheaven.csv'))
         print("albaHeaven Clicked")
         
 
     def albaMerge_btn(self) :
-        self.loadCSV('albamerge.csv')
+        self.loadCSV(os.path.abspath('albamerge.csv'))
         print("albaHeaven Clicked")
 
 
